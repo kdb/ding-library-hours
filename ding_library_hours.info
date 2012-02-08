@@ -1,0 +1,6 @@
+name = "Ding! library hours"
+description = "Uses the opening hours module to show opening hours for the library and its related features in a compound widget."
+core = "6.x"
+package = "Ding!"
+dependencies[] = "ding_library"
+dependencies[] = "opening_hours"

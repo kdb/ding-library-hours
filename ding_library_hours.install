@@ -1,0 +1,13 @@
+<?php
+/**
+ * @file
+ * Install and upgrade functions for ding_library_hours.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function ding_library_hours_install() {
+  // Increase module weight so we can override other modules.
+  db_query("UPDATE {system} SET weight = 11 WHERE name = 'ding_library_hours'");
+}

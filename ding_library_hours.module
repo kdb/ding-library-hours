@@ -1,0 +1,50 @@
+<?php
+/**
+ * @file
+ * Extended opening hours widget for Ding libraries.
+ */
+
+/**
+ * Get features with opening hours for the provided library.
+ *
+ * Provides a list of nid => title mappings, suitable for a select box
+ * for picking the feature you’d like to see opening hours for.
+ */
+function ding_library_hours_options($node) {
+  $options = array($node->nid => check_plain($node->title));
+
+  // Select node ID and title for related features.
+  // TODO: Refactor this to use dynamic table and column names.
+  $query = db_query("
+    SELECT n.nid, n.title FROM content_field_feature_ref AS cffr
+    LEFT JOIN node AS n ON (n.nid = cffr.field_feature_ref_nid)
+    WHERE cffr.nid = %d
+  ", array(
+    ':nid' => $node->nid,
+  ));
+
+  while ($row = db_fetch_object($query)) {
+    if (opening_hours_present_on_node($row->nid)) {
+      $options[$row->nid] = check_plain($row->title);
+    }
+  }
+
+  return $options;
+}
+
+/**
+ * Preprocess variables for the week template.
+ */
+function ding_library_hours_preprocess_opening_hours_week(&$vars) {
+  // Only go through all this extra work for libraries.
+  if ($vars['node']->type == 'library') {
+    $options = ding_library_hours_options($vars['node']);
+
+    // If there’s more than one option, we need to provide extra data to
+    // the page and load our JavaScript.
+    if (count($options) > 1) {
+      drupal_add_js(drupal_get_path('module', 'ding_library_hours') .  '/ding_library_hours.js');
+      drupal_add_js(array('ding' => array('libraryHours' => array($vars['node']->nid => $options))), 'setting');
+    }
+  }
+}
