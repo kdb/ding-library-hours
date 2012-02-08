@@ -10,26 +10,35 @@
  * Provides a list of nid => title mappings, suitable for a select box
  * for picking the feature you’d like to see opening hours for.
  */
-function ding_library_hours_options($node) {
-  $options = array($node->nid => check_plain($node->title));
+function ding_library_hours_options($node, $reset = FALSE) {
+  $cache_key = __FUNCTION__ . ':' . $node->nid;
 
-  // Select node ID and title for related features.
-  // TODO: Refactor this to use dynamic table and column names.
-  $query = db_query("
-    SELECT n.nid, n.title FROM content_field_feature_ref AS cffr
-    LEFT JOIN node AS n ON (n.nid = cffr.field_feature_ref_nid)
-    WHERE cffr.nid = %d
-  ", array(
-    ':nid' => $node->nid,
-  ));
-
-  while ($row = db_fetch_object($query)) {
-    if (opening_hours_present_on_node($row->nid)) {
-      $options[$row->nid] = check_plain($row->title);
-    }
+  if (!$reset && $cache = cache_get($cache_key)) {
+    return $cache->data;
   }
+  else {
+    $options = array($node->nid => check_plain($node->title));
 
-  return $options;
+    // Select node ID and title for related features.
+    // TODO: Refactor this to use dynamic table and column names.
+    $query = db_query("
+      SELECT n.nid, n.title FROM content_field_feature_ref AS cffr
+      LEFT JOIN node AS n ON (n.nid = cffr.field_feature_ref_nid)
+      WHERE cffr.nid = %d
+    ", array(
+      ':nid' => $node->nid,
+    ));
+
+    while ($row = db_fetch_object($query)) {
+      if (opening_hours_present_on_node($row->nid)) {
+        $options[$row->nid] = check_plain($row->title);
+      }
+    }
+
+    cache_set($cache_key, $options);
+
+    return $options;
+  }
 }
 
 /**
