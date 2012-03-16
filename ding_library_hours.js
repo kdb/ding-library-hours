@@ -31,21 +31,46 @@
     return view;
   };
 
-  // When the document is ready, snatch up a copy of a placeholder.
+  // When the document is ready...
   $(function() {
+    // Snatch up a copy of a placeholder.
     viewPlaceholder = $('.opening-hours-week.placeholder').eq(0).clone();
+
+    // As a workarond for http://drupal.org/node/1472434, create an
+    // index of which nodes have extra data and where in the list their
+    // data is, since the data array cannot be keyed by nid.
+    Drupal.libraryHoursDataIndexes = {};
+    $.each(Drupal.settings.ding.libraryHours, function (idx, data) {
+      var nid;
+
+      console.log(data);
+
+      // Extract the nid from the first item.
+      $.each(data, function (iterNid, iterData) {
+        console.log(iterData);
+        if (!nid) {
+          nid = iterNid;
+        }
+      });
+
+      Drupal.libraryHoursDataIndexes[nid] = idx;
+    });
   });
 
   // When Opening Hours is done setting up, we want to do our thing.
   $(window).bind('OpeningHoursLoaded', function () {
 
     $('.opening-hours-week').each(function () {
-      var nid = parseInt($(this).attr('data-nid'), 10), select;
+      var nid = parseInt($(this).attr('data-nid'), 10),
+          // Numeric keys are broken in Drupal 6, this is a workaround.
+          // See http://drupal.org/node/1472434
+          key = Drupal.libraryHoursDataIndexes[nid],
+          select;
 
-      if (Drupal.settings.ding.libraryHours[nid]) {
+      if (Drupal.settings.ding.libraryHours[key]) {
         select = $('<select></select');
 
-        $.each(Drupal.settings.ding.libraryHours[nid], function (nid, title) {
+        $.each(Drupal.settings.ding.libraryHours[key], function (nid, title) {
           $('<option></option>')
             .attr('value', nid)
             .text(title)
