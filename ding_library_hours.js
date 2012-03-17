@@ -65,7 +65,7 @@
           select;
 
       if (Drupal.settings.ding.libraryHours[key]) {
-        select = $('<select></select');
+        select = $('<select class="ding-library-hours-department-selector"></select');
 
         $.each(Drupal.settings.ding.libraryHours[key], function (nid, title) {
           $('<option></option>')
