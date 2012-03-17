@@ -43,11 +43,8 @@
     $.each(Drupal.settings.ding.libraryHours, function (idx, data) {
       var nid;
 
-      console.log(data);
-
       // Extract the nid from the first item.
       $.each(data, function (iterNid, iterData) {
-        console.log(iterData);
         if (!nid) {
           nid = iterNid;
         }
