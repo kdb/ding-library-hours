@@ -67,9 +67,9 @@
       if (Drupal.settings.ding.libraryHours[key]) {
         select = $('<select></select>');
 
-        $.each(Drupal.settings.ding.libraryHours[key], function (nid, title) {
+        $.each(Drupal.settings.ding.libraryHours[key], function (deptId, title) {
           $('<option></option>')
-            .attr('value', nid)
+            .attr('value', deptId)
             .text(title)
             .appendTo(select);
         });
@@ -78,18 +78,18 @@
         // shown to the relevant department’s hours.
         select.change(function () {
           var $this = $(this),
-              nid = $this.val(),
+              deptId = $this.val(),
               parent = $this.parent(),
               showView;
 
           // Fade out currently visible hours.
           parent.find('.opening-hours-week:visible').fadeOut(function () {
             // Find the week-view we want to show now.
-            showView = parent.find('.opening-hours-week[data-nid=' + nid + ']');
+            showView = parent.find('.opening-hours-week[data-nid=' + deptId + ']');
 
             // If display does not exist, create it.
             if (showView.length < 1) {
-              createWeekView(nid).render().el.insertBefore(select);
+              createWeekView(deptId).render().el.insertBefore(select);
             }
             // Otherwise, just fade it in.
             else {
