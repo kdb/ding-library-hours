@@ -65,7 +65,7 @@
           select;
 
       if (Drupal.settings.ding.libraryHours[key]) {
-        select = $('<select class="ding-library-hours-department-selector"></select');
+        select = $('<select></select>');
 
         $.each(Drupal.settings.ding.libraryHours[key], function (nid, title) {
           $('<option></option>')
@@ -100,6 +100,9 @@
 
         // Add the select right after the original opening hours widget.
         select.insertAfter(this);
+
+        // Add a wrapper div for easier styling.
+        select.wrap('<div class="ding-library-hours-department-selector"></div>');
       }
     });
 
