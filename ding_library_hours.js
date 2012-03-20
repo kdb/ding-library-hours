@@ -79,17 +79,17 @@
         select.change(function () {
           var $this = $(this),
               deptId = $this.val(),
-              parent = $this.parent(),
+              wrapper = $this.parents('.node'),
               showView;
 
           // Fade out currently visible hours.
-          parent.find('.opening-hours-week:visible').fadeOut(function () {
+          wrapper.find('.opening-hours-week:visible').fadeOut(function () {
             // Find the week-view we want to show now.
-            showView = parent.find('.opening-hours-week[data-nid=' + deptId + ']');
+            showView = wrapper.find('.opening-hours-week[data-nid=' + deptId + ']');
 
             // If display does not exist, create it.
             if (showView.length < 1) {
-              createWeekView(deptId).render().el.insertBefore(select);
+              createWeekView(deptId).render().el.insertBefore(wrapper.find('.opening-hours-week:first'));
             }
             // Otherwise, just fade it in.
             else {
