@@ -82,6 +82,13 @@
               wrapper = $this.parents('.node'),
               showView;
 
+          // If not inside a node wrapper, try and find a block or panel
+          // pane as context. This would be much safer if we could use
+          // .closest, but we need a newer jQuery for that.
+          if (wrapper.length < 1) {
+            wrapper = $this.parents('.block, .panel-pane');
+          }
+
           // Fade out currently visible hours.
           wrapper.find('.opening-hours-week:visible').fadeOut(function () {
             // Find the week-view we want to show now.
