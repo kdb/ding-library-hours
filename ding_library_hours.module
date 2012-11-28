@@ -5,6 +5,94 @@
  */
 
 /**
+ * Implements hook_block().
+ */
+function ding_library_hours_block($op = 'list', $delta = 0, $edit = array()) {
+  switch ($op) {
+    case 'list':
+      return array(
+        'today' => array(
+          'info' => t('Library opening hours for the day'),
+          'cache' => BLOCK_NO_CACHE,
+        ),
+      );
+    break;
+    case 'view':
+      $block = array();
+
+      $hours = ding_library_hours_get_day(date('Y-m-d', $_SERVER['REQUEST_TIME']));
+
+      $block['title'] = t('Opening hours for today');
+      $block['content'] = theme('ding_library_hours_day', $hours);
+
+      return $block;
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function ding_library_hours_theme($existing, $type, $theme, $path) {
+  return array(
+    'ding_library_hours_day' => array(
+      'arguments' => array('hours' => NULL),
+      'path' => $path . '/templates',
+      'template' => 'ding-library-hours-day',
+    ),
+    'ding_library_hours_time' => array(
+      'arguments' => array('time' => NULL),
+    ),
+  );
+}
+
+/**
+ * Get opening hours for a day.
+ *
+ * @param string $date
+ *   The date to get hours for.
+ *
+ * @return array
+ *   Return array of hours, grouped by node.
+ */
+function ding_library_hours_get_day($date) {
+  $cache_key = __FUNCTION__ . ':' . $date;
+
+  if (!$reset && $cache = cache_get($cache_key)) {
+    return $cache->data;
+  }
+  else {
+    $hours = array();
+
+    $node_query = db_query("
+      SELECT nid, title FROM {node}
+      WHERE type = 'library'
+    ");
+
+    while ($row = db_fetch_object($node_query)) {
+      $row->hours = array();
+
+      $hours_query = db_query("
+        SELECT start_time, end_time FROM {opening_hours}
+        WHERE nid = %d AND date = '%s'
+      ", array(
+        ':nid' => $row->nid,
+        ':date' => $date,
+      ));
+
+      while ($hour_row = db_fetch_object($hours_query)) {
+        $row->hours[] = $hour_row;
+      }
+
+      $hours[$row->nid] = $row;
+    }
+
+    cache_set($cache_key, $hours, $_SERVER['REQUEST_TIME'] + 86400);
+
+    return $hours;
+  }
+}
+
+/**
  * Get features with opening hours for the provided library.
  *
  * Provides a list of nid => title mappings, suitable for a select box
@@ -39,6 +127,15 @@ function ding_library_hours_options($node, $reset = FALSE) {
 
     return $options;
   }
+}
+
+/**
+ * Format a time value for display.
+ */
+function theme_ding_library_hours_time($time) {
+  $parts = explode(':', $time);
+
+  return implode('.', array($parts[0], $parts[1]));
 }
 
 /**
