@@ -64,8 +64,10 @@ function ding_library_hours_get_day($date) {
     $hours = array();
 
     $node_query = db_query("
-      SELECT nid, title FROM {node}
-      WHERE type = 'library'
+      SELECT n.nid, n.title FROM {node} AS n
+      LEFT JOIN {ding_library} AS dl USING (nid)
+      WHERE n.type = 'library'
+      ORDER BY dl.library_weight, n.title
     ");
 
     while ($row = db_fetch_object($node_query)) {
