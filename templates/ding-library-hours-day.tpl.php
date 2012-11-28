@@ -18,6 +18,9 @@
         <em class="end"><?php echo theme('ding_library_hours_time', $instance->end_time); ?></em>
       </li>
     <?php endforeach; ?>
+    <?php if (empty($node->hours)): ?>
+      <li class="interval closed"><?php echo t('Closed'); ?></li>
+    <?php endif; ?>
     </ul>
   </li>
 <?php endforeach; ?>
