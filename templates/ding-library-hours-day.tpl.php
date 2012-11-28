@@ -3,12 +3,13 @@
  * @file
  * Template to render library opening hours for a single day.
  */
-dpm($variables);
 ?>
 <ul class="ding-library-hours-day">
 <?php foreach ($hours as $node): ?>
-  <li class="library" data-nid="<?php echo $node->nid; ?>">
-    <?php echo l($node->title, 'node/' . $node->nid); ?>
+  <li class="library clearfix" data-nid="<?php echo $node->nid; ?>">
+    <h5 class="title">
+      <?php echo l($node->title, 'node/' . $node->nid); ?>
+    </h5>
 
     <ul class="hours">
     <?php foreach ($node->hours as $instance): ?>
